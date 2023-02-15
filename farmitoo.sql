@@ -1,4 +1,4 @@
-Select distinct TOP 500
+Select
 'G¹ska sp. z o.o.' as [partner],
 case when Twr_PrdNumer = 19468 then 'JAG-PREMIUM' else 'JAG' end as [brand],
 'Aftermarket' as [sparepart_type],
@@ -39,31 +39,18 @@ and CDN.TwrGrupaPelnaNazwa(Twg_GRONumer) like '6.1%'),'') as [category],
 
 
 
---Grupuje oraz Outputtuje to co jest pomiedzy 2-gim a 3-cim '/' w pe³nej nazwie grupy, czyli do jakiej maszyny/pojazdu s³u¿y (jeœli dobrze rozumiem) np. 'Ci¹gnik', 'Prasa' itp. 
-STUFF((Select distinct ','+SUBSTRING(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) + 1, 
+--Outputtuje to co jest pomiedzy 2-gim a 3-cim '/' w pe³nej nazwie grupy, czyli do jakiej maszyny/pojazdu s³u¿y np. 'Ci¹gnik', 'Prasa' itp. 
+SUBSTRING(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) + 1, 
     CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) + 1) - 
-    CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) - 1)
-	from cdn.twrgrupy KS with(nolock)
-	where ks.TwG_GIDNumer = kk.TwG_GIDNumer
-	and CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) > 0
-	and TwG_GrONumer BETWEEN 36501 AND 53404
-	and CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) + 1) > 0
-	FOR XML PATH ('')), 1, 1, '') AS [model_vehicle_code],
+    CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) - 1) AS [model_vehicle_code],
 
 
 --Outputuje to co jest pomiedzy 1-szym a 2-gim '/' w pe³nej nazwie grupy czyli marke np. 'CLASS','URSUS' itp.
 SUBSTRING(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1, CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) - CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) - 1) AS [model_brand_name],
 
 
---Grupuje Wszystkie ID Modeli (to co jest po ostatnim '/' w pe³nej nazwie grupy)
-STUFF((Select ',' + REVERSE(SUBSTRING(REVERSE(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)), 0, CHARINDEX('/', REVERSE(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)))))
-from cdn.twrgrupy KS with(nolock)
-where ks.TwG_GIDNumer = kk.TwG_GIDNumer
-and TwG_GrONumer BETWEEN 36501 AND 53404
-and CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) > 0
-and SUBSTRING(CDN.TwrGrupaPelnaNazwa(ks.Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(ks.Twg_GRONumer)) + 1, CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(ks.Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(ks.Twg_GRONumer)) + 1) - CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(ks.Twg_GRONumer)) - 1)
-= SUBSTRING(CDN.TwrGrupaPelnaNazwa(kk.Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(kk.Twg_GRONumer)) + 1, CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(kk.Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(kk.Twg_GRONumer)) + 1) - CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(kk.Twg_GRONumer)) - 1)
-FOR XML PATH ('')), 1, 1, '') as [model_ID]
+--ID Modeli (to co jest po ostatnim '/' w pe³nej nazwie grupy)
+REVERSE(SUBSTRING(REVERSE(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)), 0, CHARINDEX('/', REVERSE(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer))))) as [model_ID]
 
 
 from cdn.TwrKarty SS with(nolock)
@@ -80,7 +67,12 @@ and TPO_JezykId = 0
 and Atr_Wartosc = 'Standardowy'
 and TwG_GrONumer BETWEEN 36501 AND 53404
 and CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) > 0
+and CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) + 1) > 0
+and REVERSE(SUBSTRING(REVERSE(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)), 0, CHARINDEX('/', REVERSE(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer))))) not in ('PRASY KOSTKUJ¥CE','CONSTANT','DOMINANT')
 --and AtK_ID in (28,25,29)
+and Twr_GIDNumer<=4176
+
+
 
 
 
