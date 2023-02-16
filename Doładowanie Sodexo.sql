@@ -18,7 +18,7 @@ join cdn.PrcRole with(nolock) on KnS_KntNumer=PrR_PrcNumer AND KnS_KntLp=PrR_Prc
 
 where PrR_RolId = 11
 and TrN_GIDTyp in (2033,2041,2001,2009,2042,2034, 2037, 2045)
-and TrN_Data2 >DATEDIFF(DD,'18001228',GETDATE()-730)
+and TrN_Data2 > DATEDIFF(DD,'18001228',GETDATE()-730)
 
 group by knt_akronim, Knt_GIDNumer, Knt_KartaLoj, KnS_Nazwa
 
@@ -30,8 +30,11 @@ and (select isnull(sum(TrP_Pozostaje),0)
 		from cdn.traplat WITH (NOLOCK) 
 		where 
 		Knt_GIDNumer=TrP_KntNumer 
-		and TRP_KntTyp=32 and dateadd(day, TrP_Termin+14, '18001228') < getdate()
+		and TRP_KntTyp=32 
+		and dateadd(day, TrP_Termin+14, '18001228') < case when datepart(day,getdate())<=10 then getdate() else getdate() - datepart(day,getdate()) + 10 end
 		and TrP_Rozliczona=0
 		and TrP_FormaNr=20
 		and TrP_GIDTyp in (2033,2001,2037)
 		and trp_typ=2)<=0
+
+order by Knt_Akronim
