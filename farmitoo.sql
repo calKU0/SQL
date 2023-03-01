@@ -18,11 +18,24 @@ isnull(STUFF(
                            FOR XML PATH ('')), 1, 1, ''
                ),'') as [description],
 
-cast((twC_wartosc/4.7) as decimal(10,2)) as [cost],
-cast((twC_wartosc*1.35)/4.7 as decimal(10,2)) as [price],
+--Pobieranie kursu z tabeli historia waluty
+cast((twC_wartosc/(select top 1 (WaE_KursL/WaE_KursM) 
+from cdn.WalElem 
+where WaE_Symbol='EUR'
+and WaE_Lp=4
+order by WaE_OpisKursu desc)) as decimal(10,2)) as [cost],
+
+--Pobieranie kursu z tabeli historia waluty i mno¿enie przez x, aby otrzymac cene detaliczn¹ u nich na stronie
+cast((twC_wartosc*1.3/(select top 1 (WaE_KursL/WaE_KursM) 
+from cdn.WalElem 
+where WaE_Symbol='EUR'
+and WaE_Lp=4
+order by WaE_OpisKursu desc)) as decimal(10,2)) as [price],
+
 guarantee_y = 2,
 Twr_Ean as [ean_code],
 Twr_Waga as [total_weight_kg],
+
 country_origin = 'Poland',
 delivery_de_delay = '2-3 days',
 delivery_at_delay = '2-3 days',
