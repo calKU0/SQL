@@ -5,7 +5,7 @@ case when Twr_PrdNumer = 19468 then 'JAG-PREMIUM' else 'JAG' end as [brand],
 Twr_Kod as [product_sku],
 Twr_Nazwa as [title],
 
---Grupuje klase oraz wartosci atrubutów jakie posiada produkt. Warunek taki, ¿e grupa klas atrybutów, to wymiary towaru
+--Grupuje key oraz value atrubutów jakie posiada produkt. Warunek taki, ¿e key group atrybutów, to wymiary towaru
 isnull(STUFF(
                  (SELECT distinct ', ' + AtK_Nazwa + ': ' + Atr_Wartosc from cdn.TwrKarty US with(nolock)
 				 join cdn.Atrybuty with(nolock) on Twr_GIDNumer=Atr_ObiNumer and Atr_OBITyp=16 and Atr_OBILp = 0
@@ -58,12 +58,12 @@ SUBSTRING(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelna
     CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) - 1) AS [model_vehicle_code],
 
 
---Outputuje to co jest pomiedzy 1-szym a 2-gim '/' w pe³nej nazwie grupy czyli marke np. 'CLASS','URSUS' itp.
+--Outputtuje to co jest pomiedzy 1-szym a 2-gim '/' w pe³nej nazwie grupy czyli marke np. 'CLASS','URSUS' itp.
 SUBSTRING(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1, CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) - CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) - 1) AS [model_brand_name],
 
 
 --ID Modeli (to co jest po ostatnim '/' w pe³nej nazwie grupy)
-REVERSE(SUBSTRING(REVERSE(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)), 0, CHARINDEX('/', REVERSE(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer))))) as [model_ID]
+(select top 1 TwG_Nazwa from cdn.twrgrupy ss where ss.twg_gidnumer = kk.twg_gronumer and TwG_GIDTyp = -16) as [model_id]
 
 
 from cdn.TwrKarty SS with(nolock)
@@ -72,7 +72,7 @@ join cdn.Atrybuty with(nolock) on Twr_GIDNumer=Atr_ObiNumer and Atr_OBITyp=16 an
 join cdn.AtrybutyKlasy with(nolock) on  AtK_ID=Atr_AtkId
 --left join cdn.TwrOpisy with(nolock) on Twr_GIDNumer=TwO_TwrNumer
 join cdn.TwrAplikacjeOpisy with(nolock) on Twr_GIDTyp=TPO_ObiTyp AND Twr_GIDNumer=TPO_ObiNumer	and Twr_GIDTyp=16
-join cdn.twrgrupy KK with(nolock) on Twr_GIDTyp=TwG_GIDTyp AND Twr_GIDNumer=TwG_GIDNumer and TwG_GIDTyp=16
+left join cdn.twrgrupy KK with(nolock) on Twr_GIDTyp=TwG_GIDTyp AND Twr_GIDNumer=TwG_GIDNumer and TwG_GIDTyp=16
 
 where TwC_TwrLp = 3
 and Twr_PrdNumer in (19468,19467)
@@ -81,16 +81,6 @@ and Atr_Wartosc = 'Standardowy'
 and TwG_GrONumer BETWEEN 36501 AND 53404
 and CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) > 0
 and CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) + 1) > 0
-and REVERSE(SUBSTRING(REVERSE(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)), 0, CHARINDEX('/', REVERSE(CDN.TwrGrupaPelnaNazwa(Twg_GRONumer))))) not in ('PRASY KOSTKUJ¥CE','CONSTANT','DOMINANT')
+and (select top 1 TwG_Nazwa from cdn.twrgrupy ss where ss.twg_gidnumer = kk.twg_gronumer and TwG_GIDTyp = -16) <> 'PRASY KOSTKUJ¥CE'
 --and AtK_ID in (28,25,29)
 and Twr_GIDNumer<=4176
-
-
-
-
-
-
-
-
-
-
