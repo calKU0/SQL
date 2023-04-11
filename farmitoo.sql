@@ -83,4 +83,5 @@ and CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrG
 and CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer), CHARINDEX('/', CDN.TwrGrupaPelnaNazwa(Twg_GRONumer)) + 1) + 1) > 0
 and (select top 1 TwG_Nazwa from cdn.twrgrupy ss where ss.twg_gidnumer = kk.twg_gronumer and TwG_GIDTyp = -16) <> 'PRASY KOSTKUJ¥CE'
 --and AtK_ID in (28,25,29)
-and Twr_GIDNumer<=4176
+and Twr_GIDNumer<=68168
+order by Twr_Kod
