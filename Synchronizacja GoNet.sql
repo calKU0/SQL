@@ -110,6 +110,16 @@ FOR XML PATH('')), 1, 1, ''),'') as [Reklamacje]
 --Przeterminowane P³atnoœci
 ,isnull(Plat_Suma,0) as [Przeterminowane P³atnoœci]
 
+--Atrybuty
+,isnull(rk.Atr_Wartosc,'') as [Przedstawiciele rodzaj kontrahenta]
+,isnull(rko.Atr_Wartosc,'') as [Przedstawiciele rodzaj kontrahenta opis]
+,isnull(zdk.Atr_Wartosc,'') as [Przedstawiciele zakres dzia³alnoœci kontrahenta]
+,isnull(zdko.Atr_Wartosc,'') as [Przedstawiciele zakres dzia³alnosci kontrahenta opis]
+,isnull(ia.Atr_Wartosc,'') as [Przedstawiciele interesuj¹cy asortyment]
+,isnull(pu.Atr_Wartosc,'') as [Promesa uczestnik]
+,isnull(puo.Atr_Wartosc,'') as [Promesa uzyskany obrot]
+,isnull(ppo.Atr_Wartosc,'') as [Promesa pocz¹tek okresu]
+
 from cdn.KntKarty sa with(nolock)
 left join Obrot on Knt_GIDNumer = Obr_KntID
 left join Logowania on Knt_GIDNumer = Log_KntId
@@ -117,5 +127,12 @@ left join Klikniecia on Knt_GIDNumer = Klik_KntID
 left join ObrotKategorieRynkowe on Knt_GIDNumer = OKR_KntID
 left join LastLogowanie on Knt_GIDNumer = Lst_KntID
 left join PrzeterminowePlatnosci on Knt_GIDNumer = Plat_KntID
-
+left join cdn.Atrybuty rk on Knt_GIDNumer=rk.Atr_ObiNumer and rk.Atr_OBITyp=32 AND rk.Atr_OBISubLp=0 and rk.atr_atkid = 453
+left join cdn.Atrybuty rko on Knt_GIDNumer=rko.Atr_ObiNumer and rko.Atr_OBITyp=32 AND rko.Atr_OBISubLp=0 and rko.atr_atkid = 454
+left join cdn.Atrybuty zdk on Knt_GIDNumer=zdk.Atr_ObiNumer and zdk.Atr_OBITyp=32 AND zdk.Atr_OBISubLp=0 and zdk.atr_atkid = 455
+left join cdn.Atrybuty zdko on Knt_GIDNumer=zdko.Atr_ObiNumer and zdko.Atr_OBITyp=32 AND zdko.Atr_OBISubLp=0 and zdko.atr_atkid = 456
+left join cdn.Atrybuty ia on Knt_GIDNumer=ia.Atr_ObiNumer and ia.Atr_OBITyp=32 AND ia.Atr_OBISubLp=0 and ia.atr_atkid = 457
+left join cdn.Atrybuty pu on Knt_GIDNumer=pu.Atr_ObiNumer and pu.Atr_OBITyp=32 AND pu.Atr_OBISubLp=0 and pu.atr_atkid = 188
+left join cdn.Atrybuty puo on Knt_GIDNumer=puo.Atr_ObiNumer and puo.Atr_OBITyp=32 AND puo.Atr_OBISubLp=0 and puo.atr_atkid = 189
+left join cdn.Atrybuty ppo on Knt_GIDNumer=ppo.Atr_ObiNumer and ppo.Atr_OBITyp=32 AND ppo.Atr_OBISubLp=0 and ppo.atr_atkid = 187
 where Knt_Archiwalny = 0
