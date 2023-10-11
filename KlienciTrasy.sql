@@ -23,3 +23,4 @@ and i.IDMANAGERA = 78 -- Trasy Automat jako prowadz¹cy
 '
 
 )
+where [Data Koniec] >= GETDATE()
