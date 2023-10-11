@@ -91,15 +91,35 @@ FOR XML PATH('')), 1, 1, ''),'') as [Reklamacje]
 --Przeterminowane P³atnoœci
 ,isnull(Plat_Suma,0) as [Przeterminowane P³atnoœci]
 
+--Atrybuty
+,rk.Atr_Wartosc as [Przedstawiciele rodzaj kontrahenta]
+,rko.Atr_Wartosc as [Przedstawiciele rodzaj kontrahenta opis]
+,zdk.Atr_Wartosc as [Przedstawiciele zakres dzia³alnoœci kontrahenta]
+,zdko.Atr_Wartosc as [Przedstawiciele zakres dzia³alnosci kontrahenta opis]
+,replace(replace(pu.Atr_Wartosc,'<',''),'>','') as [Promesa uczestnik]
+,replace(puo.Atr_Wartosc,'.',',') as [Promesa uzyskany obrot]
+,CONVERT(DATE, DATEADD(DAY,convert(int,ppo.Atr_Wartosc),'1800-12-28')) as [Promesa pocz¹tek okresu]
+,co.Atr_Wartosc as [Czy odwiedzaæ]
+,piw.Atr_Wartosc as [Potrzebna iloœæ wizyt]
+
+
 from cdn.KntAdresy sa
 join cdn.KntKarty on Knt_GIDNumer=KnA_KntNumer and KnA_KntTyp=32
 join cdn.Rejony on REJ_Id=KnA_RegionCRM
 join cdn.KntOpiekun on REJ_Id=KtO_KntNumer
 join cdn.PrcKarty on Prc_GIDNumer=KtO_PrcNumer	
---left join cdn.Atrybuty on KnA_GIDNumer=Atr_ObiNumer AND KnA_GIDTyp=Atr_ObiTyp and Atr_OBITyp=864 or Atr_OBITyp=896 and Atr_AtkId = 470
 left join Obrot on Knt_GIDNumer = Obr_KnAID
 left join ObrotKategorieRynkowe on Knt_GIDNumer = OKR_KnAID
 left join PrzeterminowePlatnosci on Knt_GIDNumer = Plat_KnAID
+left join cdn.Atrybuty rk with(nolock) on KnA_GIDTyp=rk.Atr_ObiTyp AND KnA_GIDNumer=rk.Atr_ObiNumer and (rk.Atr_OBITyp=864 or rk.Atr_OBITyp=896) and rk.atr_atkid = 453
+left join cdn.Atrybuty rko with(nolock) on KnA_GIDTyp=rko.Atr_ObiTyp AND KnA_GIDNumer=rko.Atr_ObiNumer and (rko.Atr_OBITyp=864 or rko.Atr_OBITyp=896)  and rko.atr_atkid = 454
+left join cdn.Atrybuty zdk with(nolock) on KnA_GIDTyp=zdk.Atr_ObiTyp AND KnA_GIDNumer=zdk.Atr_ObiNumer  and (zdk.Atr_OBITyp=864 or zdk.Atr_OBITyp=896) and zdk.atr_atkid = 455
+left join cdn.Atrybuty zdko with(nolock) on KnA_GIDTyp=zdko.Atr_ObiTyp AND KnA_GIDNumer=zdko.Atr_ObiNumer and (zdko.Atr_OBITyp=864 or zdko.Atr_OBITyp=896)  and zdko.atr_atkid = 456
+left join cdn.Atrybuty pu with(nolock) on KnA_GIDTyp=pu.Atr_ObiTyp AND KnA_GIDNumer=pu.Atr_ObiNumer and (pu.Atr_OBITyp=864 or pu.Atr_OBITyp=896) and pu.atr_atkid = 188
+left join cdn.Atrybuty puo with(nolock) on KnA_GIDTyp=puo.Atr_ObiTyp AND KnA_GIDNumer=puo.Atr_ObiNumer and (puo.Atr_OBITyp=864 or puo.Atr_OBITyp=896) and puo.atr_atkid = 189
+left join cdn.Atrybuty ppo with(nolock) on KnA_GIDTyp=ppo.Atr_ObiTyp AND KnA_GIDNumer=ppo.Atr_ObiNumer and (ppo.Atr_OBITyp=864 or ppo.Atr_OBITyp=896) and ppo.atr_atkid = 187
+left join cdn.Atrybuty co with(nolock) on KnA_GIDTyp=co.Atr_ObiTyp AND KnA_GIDNumer=co.Atr_ObiNumer and (co.Atr_OBITyp=864 or co.Atr_OBITyp=896) and ppo.atr_atkid = 470
+left join cdn.Atrybuty piw with(nolock) on KnA_GIDTyp=piw.Atr_ObiTyp AND KnA_GIDNumer=piw.Atr_ObiNumer and (piw.Atr_OBITyp=864 or piw.Atr_OBITyp=896) and ppo.atr_atkid = 459
 
 
 where KtO_Glowny = 0 and KnA_AdresBank = 1 and KnA_DataArc = ''
