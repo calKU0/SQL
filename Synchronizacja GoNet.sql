@@ -1,3 +1,21 @@
+USE [CDNXL_GASKA]
+GO
+/****** Object:  StoredProcedure [dbo].[GoNet_Synchronizacja]    Script Date: 16.10.2023 14:38:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+ALTER PROCEDURE [dbo].[GoNet_Synchronizacja]
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
 WITH
 Obrot AS (select Knt_GIDNumer as [Obr_KntID]
 ,isnull(sum(case when TrN_TrNRok = YEAR(getdate()) and TrN_Data2 <= DATEDIFF(DD,'18001228', getdate()) then tre_ksiegowanetto else null end),0) as [Obr_TenRok]
@@ -47,14 +65,14 @@ group by Knt_GIDNumer
 ,Logowania AS (select r_lg_kntid as [Log_KntID]
 ,count(r_lg_id) as [Log_Suma]
 from [serwer-sql].[nowe_b2b].[ldd].[rptlogowanie] with(nolock)
-where month(r_lg_data) = month(DATEADD(month,-1,getdate())) and year(r_lg_data) = year(getdate())
+where  r_lg_data > getdate() -30
 group by r_lg_kntid)
 
 
 ,Klikniecia AS (Select r_twr_kntid as [Klik_KntID],
 count(distinct DATEADD(MINUTE, DATEDIFF(MINUTE, 0, r_twr_data), 0)) / 2 as [Klik_Suma]
 from [serwer-sql].[nowe_b2b].[ldd].[RptTowary] with (nolock)
-where month(r_twr_data) = month(DATEADD(month,-1,getdate())) and year(r_twr_data) = year(getdate())
+where r_twr_data > getdate() -30
 group by r_twr_kntid)
 
 
@@ -78,8 +96,9 @@ group by RLE_Status, RLN_KntNumer)
 
 select distinct
 
-Knt_GIDNumer
-,Knt_Akronim
+Knt_GIDNumer as [Centrala ID]
+,Knt_Akronim as [Akronim]
+,SLW_WartoscS as [Rodzaj]
 
 --Obroty
 ,isnull(convert(varchar(25),Obr_RokTemu) + ' // ' + convert(varchar(25),Obr_TenRok) + ' (' + convert(varchar(25),CEILING((Obr_TenRok - Obr_RokTemu) / case when Obr_RokTemu = 0 then 0.01 else Obr_RokTemu end * 100)) + '%)','0.00 // 0.00 (0%)') as [Obrót Rok do Roku]
@@ -93,22 +112,22 @@ Knt_GIDNumer
 ,isnull(OKR_Sprzêg³a,0) as [Sprzêg³a]
 ,isnull(OKR_Uprawa,0) as [Uprawa ziemi]
 ,isnull(OKR_Wewnêtrzne,0) as [Wewnêtrzne]
-,isnull(OKR_Gospodarstwo,0) as [Wyposa¿. gosp. i warszt.]
+,isnull(OKR_Gospodarstwo,0) as [Wyposa¿enie gosp.]
 
 --B2B
 ,isnull(Log_Suma,0) as [Iloœæ Logowañ B2B]
-,isnull(Klik_Suma,0) as [Klikniêcia]
-,Lst_Data as [Ostatnia Data Logowania]
+,isnull(Klik_Suma,0) as [Klikniêcia B2B]
+,Lst_Data as [Ostatnia Data Logowania B2B]
 
 --Reklamacje
-,STUFF((Select ', ' + Rekl_Status + ' - ' + convert(varchar(25),Rekl_Suma)
+,STUFF((Select ',' + Rekl_Status + ' - ' + convert(varchar(25),Rekl_Suma)
 from cdn.KntKarty ss with(nolock) 
 left join Reklamacje on Knt_GIDNumer = Rekl_KntID 
 where sa.Knt_GIDNumer = ss.Knt_GIDNumer  
 FOR XML PATH('')), 1, 1, '') as [Reklamacje]
 
 --Przeterminowane P³atnoœci
-,Plat_Suma as [Przeterminowane P³atnoœci]
+,isnull(Plat_Suma,0) as [Przeterminowane P³atnoœci]
 
 --Atrybuty
 ,rk.Atr_Wartosc as [Przedstawiciele rodzaj kontrahenta]
@@ -123,6 +142,7 @@ FOR XML PATH('')), 1, 1, '') as [Reklamacje]
 ,piw.Atr_Wartosc as [Potrzebna iloœæ wizyt]
 
 from cdn.KntKarty sa with(nolock)
+join cdn.Slowniki on SLW_ID = Knt_Rodzaj
 left join Obrot on Knt_GIDNumer = Obr_KntID
 left join Logowania on Knt_GIDNumer = Log_KntId
 left join Klikniecia on Knt_GIDNumer = Klik_KntID
@@ -140,3 +160,5 @@ left join cdn.Atrybuty ppo with(nolock) on Knt_GIDNumer=ppo.Atr_ObiNumer and ppo
 left join cdn.Atrybuty co with(nolock) on Knt_GIDNumer=co.Atr_ObiNumer and co.Atr_OBITyp=32 AND co.Atr_OBISubLp=0 and co.atr_atkid = 470
 left join cdn.Atrybuty piw with(nolock) on Knt_GIDNumer=piw.Atr_ObiNumer and piw.Atr_OBITyp=32 AND piw.Atr_OBISubLp=0 and piw.atr_atkid = 459
 where Knt_Archiwalny = 0
+
+END
