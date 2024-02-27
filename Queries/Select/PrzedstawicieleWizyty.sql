@@ -24,6 +24,6 @@ FROM OPENQUERY(gonet,
 	AND KD.ARC = 0
 	AND KO.USUNIETY = 0
 	AND KO.ARC = 0
-	AND Z.TERMINROZPOCZECIA = GETDATE() - 1
+	AND cast(Z.TERMINROZPOCZECIA as date) = cast(''NOW'' as date) - 1 
 	'
 	)

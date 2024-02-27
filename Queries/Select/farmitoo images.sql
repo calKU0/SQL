@@ -1,7 +1,7 @@
 select
 twr_kod as [product_sku],
 twr_ean as [product_ean],
-isnull('https://www.b2b.gaska.com.pl/img/produkty/'+convert(varchar,twr_gidnumer) +'/'+convert(varchar,dab_ID)+'_'+DAB_Nazwa+'.jpg','') as [image link]
+isnull('http://cstore.gaska.com.pl/Img/'+convert(varchar,twr_gidnumer) +'/'+convert(varchar,dab_ID)+'_'+DAB_Nazwa+'.jpg','') as [image link]
 from cdn.TwrKarty us with(nolock)
 left join cdn.DaneObiekty with(nolock) on Twr_GIDNumer=DAO_ObiNumer and DAO_ObiTyp=16
 left join cdn.DaneBinarne with(nolock) on DAB_ID=DAO_DABId and dab_rozszerzenie = 'jpg'

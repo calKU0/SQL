@@ -7,7 +7,7 @@ CONVERT(CHAR(8),DATEADD(second,sum(DATEDIFF(SECOND,convert(time, Dateadd(Second,
 Zad_Kod as [Nazwa zadania],
 Zad_Nazwa as [Nazwa projektu],
 Zad_Opis as [Opis],
-Zad_Notatki as [Lnk do repozytorium]
+Zad_Notatki as [Link do repozytorium]
 from cdn.zadania with (nolock)
 join cdn.ZadaniaObiekty with (nolock) on Zad_Id=ZaO_ZadId
 join cdn.PrcKarty with (nolock) on ZaO_ObiNumer=Prc_GIDNumer
