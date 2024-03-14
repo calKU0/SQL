@@ -61,12 +61,15 @@ BEGIN
 			set @temat = 'Rozpatrzone reklamacje do dos³ania klientowi'
 			set @odbiorcy = 'it@gaska.com.pl' + @emailOpiekuna + ';'
 
-			EXEC msdb.dbo.sp_send_dbmail
-			@profile_name = 'Gaska',
-			@recipients=@odbiorcy,
-			@subject = @temat,
-			@body = @tableHTML,
-			@body_format = 'HTML';
+			IF @@ROWCOUNT > 0
+			BEGIN
+				EXEC msdb.dbo.sp_send_dbmail
+				@profile_name = 'Gaska',
+				@recipients=@odbiorcy,
+				@subject = @temat,
+				@body = @tableHTML,
+				@body_format = 'HTML';
+			END
 
 		FETCH NEXT FROM LokalizacjaRLS INTO @emailOpiekuna	
 	END
