@@ -12,7 +12,7 @@ from cdn.zadania with (nolock)
 join cdn.ZadaniaObiekty with (nolock) on Zad_Id=ZaO_ZadId
 join cdn.PrcKarty with (nolock) on ZaO_ObiNumer=Prc_GIDNumer
 where Zad_OpeUNumer in (704) 
-and convert(date, Dateadd(Second, Zad_TerminOd, '1990-01-01'))  between  CONVERT(DATE, DATEADD(MONTH, DATEDIFF(MONTH, 0, getdate()), 0)) and CONVERT(DATE, DATEADD(dd,DAY(getdate()), getdate()))
+and convert(date, Dateadd(Second, Zad_TerminOd, '1990-01-01'))  between  '2025-02-01' and '2025-03-01'
 group by Zad_Kod, Zad_OpeUNumer, Zad_TerminOd, Zad_TerminDo, ZaO_ObiNumer,Prc_Imie1, Prc_Nazwisko,Zad_Nazwa,Zad_Opis,Zad_Notatki
 
 UNION ALL
@@ -40,6 +40,6 @@ LTRIM(
 	from cdn.Zadania 
 	join cdn.ZadaniaObiekty on Zad_Id = ZaO_ZadId 
 	where Zad_OpeUNumer in (704)
-	and convert(date, Dateadd(Second, Zad_TerminOd, '1990-01-01'))  between  CONVERT(DATE, DATEADD(MONTH, DATEDIFF(MONTH, 0, getdate()), 0)) and CONVERT(DATE, DATEADD(dd,DAY(getdate()), getdate()))
+	and convert(date, Dateadd(Second, Zad_TerminOd, '1990-01-01'))  between  '2025-02-01' and '2025-03-01'
 
 order by 1 asc
